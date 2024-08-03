@@ -14,7 +14,7 @@ export class SignUpUseCase {
   async execute({ email, name, password }: IInput): Promise<IOutput> {
     const accountAlreadyExists = await prismaClient.account.findUnique({
       where: {
-        email: email,
+        email,
       },
     });
 
