@@ -1,28 +1,27 @@
 import { ZodError, z } from 'zod';
 
 import { IController, IRequest, IResponse } from "../interfaces/IController";
-import { SignInUseCase } from '../useCases/SignInUseCase';
+import { SignUpUseCase } from '../useCases/SignUpUseCase';
 import { AccountAlreadyExists } from '../errors/AccountAlreadyExists';
 
 const schema = z.object({
+  name: z.string().min(2),
   email: z.string().email().min(1),
   password: z.string().min(8),
 });
 
 export class SignUpController implements IController {
-  constructor(private readonly signInUseCase: SignInUseCase) {}
+  constructor(private readonly signUpUseCase: SignUpUseCase) {}
 
   async handle({ body } : IRequest): Promise<IResponse> {
     try {
-      const { email, password } = schema.parse(body);
+      const { name, email, password } = schema.parse(body);
 
-      const { accessToken } = await this.signInUseCase.execute({ email, password });
+      await this.signUpUseCase.execute({ email, name, password });
 
       return {
-        statusCode: 200,
-        body: {
-          accessToken,
-        },
+        statusCode: 204,
+        body: null,
       };
     } catch (error) {
       if (error instanceof ZodError) {
